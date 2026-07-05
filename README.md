@@ -17,6 +17,14 @@ npm run build      # production bundle in /dist
 npm run preview    # preview the production build
 ```
 
+## Standalone version (no npm, no server)
+
+[`standalone/index.html`](standalone/index.html) is a self-contained copy of the same app —
+just open it directly in a browser (double-click it). It loads React, ReactDOM, and Babel from
+a CDN and compiles the JSX in the browser, so it needs an internet connection the first time but
+no local install or dev server. Use this for a quick look; use the npm/Vite project above for
+actual development.
+
 ## Deploy to GitHub Pages (no local build needed)
 
 1. Create a **public** repo named `YaadSpiceCo` under your account and push this folder to `main`.
