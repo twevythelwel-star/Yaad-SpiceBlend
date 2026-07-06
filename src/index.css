@@ -512,6 +512,16 @@ a {
   background: var(--char-2);
   color: var(--cream);
 }
+.order-form input[aria-invalid='true'] {
+  border-color: #e5484d;
+}
+.field-error {
+  font-family: var(--font-body);
+  font-size: 12px;
+  letter-spacing: normal;
+  text-transform: none;
+  color: #e5484d;
+}
 .method {
   border: 1px solid var(--line);
   border-radius: 8px;

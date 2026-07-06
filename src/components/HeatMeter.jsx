@@ -1,6 +1,4 @@
-// COMPONENT 4: HeatMeter (the signature element)
-// Pure presentational component: takes a heat score + label and renders
-// the ember bar. This is where the brand and the data viz are the same object.
+// Pure presentational component: renders the ember bar from a heat score + label.
 export default function HeatMeter({ score, label }) {
   // Cap the visual fill at a sensible ceiling (30 => full bar).
   const pct = Math.min(100, Math.round((score / 30) * 100))

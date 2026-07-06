@@ -1,0 +1,674 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Yaad Spice Co. — mix your own Jamaican jerk blend. Pick your spices, dial the heat, see the price live." />
+    <title>Yaad Spice Co. — Mix Yuh Own Jerk</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Anton&family=Outfit:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../src/index.css" />
+
+    <!--
+      Standalone build: no npm, no Vite, no server — just open this file.
+      React/ReactDOM/Babel are loaded from a CDN (needs an internet connection once,
+      to fetch these three scripts) and JSX below is compiled in the browser.
+      For active development, use the npm/Vite project in the parent folder instead.
+    -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/babel-jsx" id="app-source">
+      const { useState, useRef, useEffect } = React;
+
+      // ---- Data: the product catalogue ----
+      // heat = relative Scoville-ish weight used by the live HeatMeter.
+      // price = JMD per scoop added to the blend.
+      const SPICES = [
+        {
+          id: 'pimento',
+          name: 'Pimento (Allspice)',
+          note: 'The backbone of jerk. Warm, woody, sweet.',
+          heat: 0,
+          price: 1200,
+          tag: 'base',
+        },
+        {
+          id: 'scotch-bonnet',
+          name: 'Scotch Bonnet',
+          note: 'The fire. Fruity, floral, and seriously hot.',
+          heat: 9,
+          price: 1800,
+          tag: 'heat',
+        },
+        {
+          id: 'thyme',
+          name: 'Wild Thyme',
+          note: 'Earthy and green. Cools the bonnet down.',
+          heat: 0,
+          price: 90,
+          tag: 'herb',
+        },
+        {
+          id: 'escallion',
+          name: 'Escallion',
+          note: 'Sharp spring-onion bite. Classic yard flavour.',
+          heat: 1,
+          price: 900,
+          tag: 'herb',
+        },
+        {
+          id: 'ginger',
+          name: 'Ginger',
+          note: 'Bright, peppery warmth without the burn.',
+          heat: 3,
+          price: 1100,
+          tag: 'warm',
+        },
+        {
+          id: 'black-pepper',
+          name: 'Black Pepper',
+          note: 'Slow, rounded heat that builds.',
+          heat: 4,
+          price: 800,
+          tag: 'warm',
+        },
+        {
+          id: 'cinnamon',
+          name: 'Cinnamon',
+          note: 'A whisper of sweet spice. Use light.',
+          heat: 0,
+          price: 1300,
+          tag: 'sweet',
+        },
+        {
+          id: 'nutmeg',
+          name: 'Nutmeg',
+          note: 'Nutty depth. Grown right here in the hills.',
+          heat: 0,
+          price: 1400,
+          tag: 'sweet',
+        },
+      ];
+
+      // Heat label shown to the user, derived from total heat score.
+      function heatLabel(score) {
+        if (score <= 0) return 'No heat';
+        if (score <= 6) return 'Mild';
+        if (score <= 14) return 'Warm';
+        if (score <= 24) return 'Hot';
+        return 'Scorcha';
+      }
+
+      // A bit of personality: name the blend from its make-up.
+      function blendPersonality(items) {
+        if (items.length === 0) return null;
+
+        let heat = 0;
+        let hasBonnet = false;
+        let herbCount = 0;
+
+        for (const item of items) {
+          heat += item.heat * item.qty;
+          if (item.id === 'scotch-bonnet') hasBonnet = true;
+          if (item.tag === 'herb') herbCount += 1;
+        }
+        const herby = herbCount >= 2;
+
+        if (heat > 24) return 'Firestarter';
+        if (hasBonnet && herby) return 'Sunday Yard Cook';
+        if (herby) return 'Green & Easy';
+        if (heat === 0) return 'Sweet Smoke';
+        return 'House Jerk';
+      }
+
+      // ---- NavBar: sticky top navigation ----
+      function NavBar() {
+        return (
+          <header className="nav">
+            <div className="shell nav-inner">
+              <a className="brand" href="#top" aria-label="Yaad Spice Co. home">
+                <span className="dot" aria-hidden="true" />
+                YAAD SPICE CO.
+              </a>
+              <nav className="nav-links" aria-label="Main">
+                <a href="#build">Build</a>
+                <a href="#how">How it works</a>
+                <a href="#about">About</a>
+                <a className="nav-cta" href="#build">Start mixing</a>
+              </nav>
+            </div>
+          </header>
+        );
+      }
+
+      // ---- Hero ----
+      function Hero() {
+        return (
+          <section className="hero" id="top">
+            <div className="shell">
+              <p className="eyebrow">
+                <span aria-hidden="true">🇯🇲</span> Montego Bay · Small-batch · Ground to order
+              </p>
+              <h1>
+                Mix yuh own <span className="flame">jerk.</span>
+              </h1>
+              <p className="lead">
+                Eight single-origin Jamaican spices. Pick what you want, dial the heat, and watch
+                the price and the burn move with every scoop. No two blends the same.
+              </p>
+              <div className="hero-actions">
+                <a className="btn btn-primary" href="#build">Start your blend</a>
+                <a className="btn btn-ghost" href="#how">See how it works</a>
+              </div>
+              <div className="hero-meta">
+                <div><b>8</b> single spices</div>
+                <div><b>0–30+</b> heat range</div>
+                <div><b>Ground</b> the day it ships</div>
+              </div>
+            </div>
+          </section>
+        );
+      }
+
+      // ---- HeatMeter: the signature ember bar ----
+      function HeatMeter({ score, label }) {
+        // Cap the visual fill at a sensible ceiling (30 => full bar).
+        const pct = Math.min(100, Math.round((score / 30) * 100));
+        // Rough, playful Scoville read-out so the number means something.
+        const scoville = score * 1800;
+        return (
+          <div className="heat-block">
+            <div className="meter-label">
+              <span>Heat</span>
+              <b>{label}</b>
+            </div>
+            <div
+              className="meter"
+              role="progressbar"
+              aria-valuenow={pct}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-label="Blend heat level"
+            >
+              <div className="meter-fill" style={{ width: pct + '%' }} />
+            </div>
+            <p className="scoville">≈ {scoville.toLocaleString()} SHU on the tongue</p>
+          </div>
+        );
+      }
+
+      // ---- SpiceCard: rendered once per spice via props + event callbacks ----
+      const PIP_COUNT = 5;
+      const PIP_INDEXES = [0, 1, 2, 3, 4];
+
+      // Works out the CSS class for a single pip based on how many pips are lit
+      // and whether this spice is hot enough to use the "hot" color.
+      function pipClass(index, litCount, heat) {
+        if (index >= litCount) return 'pip';
+        if (heat >= 8) return 'pip hot';
+        return 'pip on';
+      }
+
+      function HeatPips({ heat }) {
+        // Show 5 pips; light them based on the spice's heat weight.
+        const litCount = Math.min(PIP_COUNT, Math.round(heat / 2));
+        return (
+          <div className="heat-pips" aria-label={`Heat level ${litCount} of 5`}>
+            {PIP_INDEXES.map((index) => (
+              <span key={index} className={pipClass(index, litCount, heat)} aria-hidden="true" />
+            ))}
+          </div>
+        );
+      }
+
+      function cardClass(selected) {
+        return selected ? 'card selected' : 'card';
+      }
+
+      function toggleClass(selected) {
+        return selected ? 'toggle added' : 'toggle';
+      }
+
+      function SpiceCard({ spice, selected, qty, onToggle, onQty }) {
+        return (
+          <article className={cardClass(selected)}>
+            <div className="card-top">
+              <h3 className="card-name">{spice.name}</h3>
+              <HeatPips heat={spice.heat} />
+            </div>
+            <p className="card-note">{spice.note}</p>
+
+            <div className="card-bottom">
+              <span className="price">JMD {spice.price}/scoop</span>
+
+              {selected ? (
+                <div className="qty" aria-label={`Quantity of ${spice.name}`}>
+                  <button onClick={() => onQty(spice.id, -1)} aria-label={`Less ${spice.name}`}>
+                    −
+                  </button>
+                  <span>{qty}</span>
+                  <button onClick={() => onQty(spice.id, 1)} aria-label={`More ${spice.name}`}>
+                    +
+                  </button>
+                </div>
+              ) : null}
+
+              <button
+                className={toggleClass(selected)}
+                onClick={() => onToggle(spice.id)}
+                aria-pressed={selected}
+              >
+                {selected ? 'Remove' : 'Add'}
+              </button>
+            </div>
+          </article>
+        );
+      }
+
+      // ---- BlendSummary: composes HeatMeter, shows totals + order flow ----
+
+      // A name should just be letters, spaces, hyphens, or apostrophes (e.g. "Mary-Jane O'Brien").
+      const NAME_PATTERN = /^[A-Za-z' -]{2,60}$/;
+      // A very simple "does this look like an email" check: something@something.something
+      const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      // Adds up price × quantity for every item in the blend.
+      function calcTotal(items) {
+        let total = 0;
+        for (const item of items) {
+          total += item.price * item.qty;
+        }
+        return total;
+      }
+
+      // Adds up heat × quantity for every item in the blend.
+      function calcHeat(items) {
+        let heat = 0;
+        for (const item of items) {
+          heat += item.heat * item.qty;
+        }
+        return heat;
+      }
+
+      // Returns an error message for the name field, or '' if it's valid.
+      function checkName(name) {
+        const trimmed = name.trim();
+        if (trimmed === '') return 'Name is required.';
+        if (!NAME_PATTERN.test(trimmed)) return 'Enter a valid name (letters only).';
+        return '';
+      }
+
+      // Returns an error message for the phone field, or '' if it's valid.
+      function checkPhone(phone) {
+        const trimmed = phone.trim();
+        if (trimmed === '') return 'Phone number is required.';
+        const digitsOnly = phone.replace(/\D/g, '');
+        if (digitsOnly.length < 7 || digitsOnly.length > 15) return 'Enter a valid phone number.';
+        return '';
+      }
+
+      // Returns an error message for the email field, or '' if it's valid.
+      function checkEmail(email) {
+        const trimmed = email.trim();
+        if (trimmed === '') return 'Email is required.';
+        if (!EMAIL_PATTERN.test(trimmed)) return 'Enter a valid email address.';
+        return '';
+      }
+
+      // Picks the confirmation message based on how the order will be received.
+      function confirmationMessage(method) {
+        if (method === 'delivery') {
+          return 'Your order is complete — you’ll get a link to confirm payment once the verified item is shipped';
+        }
+        return 'Your order is complete — you’ll get a link to confirm payment once the verified location for pickup will be sent';
+      }
+
+      function BlendSummary({ items, onOrder, ordered }) {
+        const [formOpen, setFormOpen] = useState(false);
+
+        const [name, setName] = useState('');
+        const [phone, setPhone] = useState('');
+        const [email, setEmail] = useState('');
+        const [method, setMethod] = useState('pickup');
+
+        const [nameError, setNameError] = useState('');
+        const [phoneError, setPhoneError] = useState('');
+        const [emailError, setEmailError] = useState('');
+
+        // Remembers which method the *last placed* order used, so the confirmation
+        // message stays correct even after the form resets back to "pickup".
+        const [orderedMethod, setOrderedMethod] = useState('pickup');
+
+        const total = calcTotal(items);
+        const heat = calcHeat(items);
+        const personality = blendPersonality(items);
+        const empty = items.length === 0;
+
+        // Close the form if the blend empties mid-fill-in — an empty blend can't be ordered.
+        useEffect(() => {
+          if (empty) setFormOpen(false);
+        }, [empty]);
+
+        function submitOrder(e) {
+          e.preventDefault();
+
+          const nameProblem = checkName(name);
+          const phoneProblem = checkPhone(phone);
+          const emailProblem = checkEmail(email);
+
+          setNameError(nameProblem);
+          setPhoneError(phoneProblem);
+          setEmailError(emailProblem);
+
+          // Stop here if any field failed validation, so the user can fix them.
+          if (nameProblem || phoneProblem || emailProblem) return;
+
+          setOrderedMethod(method);
+          onOrder();
+
+          // Reset the form for next time.
+          setFormOpen(false);
+          setName('');
+          setPhone('');
+          setEmail('');
+          setMethod('pickup');
+        }
+
+        return (
+          <aside className="summary" aria-live="polite">
+            <h3>Your blend</h3>
+            <p className="personality">{personality ? `“${personality}”` : 'Unnamed so far'}</p>
+
+            <HeatMeter score={heat} label={heatLabel(heat)} />
+
+            {empty ? (
+              <p className="empty">Pick at least one spice to start your blend.</p>
+            ) : (
+              <ul className="lines">
+                {items.map((i) => (
+                  <li key={i.id}>
+                    <span>
+                      <b>{i.name}</b> ×{i.qty}
+                    </span>
+                    <span className="ln-price">JMD {i.price * i.qty}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            <div className="total">
+              <span>Total</span>
+              <b>JMD {total}</b>
+            </div>
+
+            {formOpen && !empty ? (
+              <form className="order-form" onSubmit={submitOrder} noValidate>
+                <label>
+                  Name
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => {
+                      setName(e.target.value);
+                      setNameError('');
+                    }}
+                    aria-invalid={Boolean(nameError)}
+                    aria-describedby={nameError ? 'name-error' : undefined}
+                  />
+                  {nameError ? (
+                    <span className="field-error" id="name-error">
+                      {nameError}
+                    </span>
+                  ) : null}
+                </label>
+
+                <label>
+                  Phone
+                  <input
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => {
+                      setPhone(e.target.value);
+                      setPhoneError('');
+                    }}
+                    aria-invalid={Boolean(phoneError)}
+                    aria-describedby={phoneError ? 'phone-error' : undefined}
+                  />
+                  {phoneError ? (
+                    <span className="field-error" id="phone-error">
+                      {phoneError}
+                    </span>
+                  ) : null}
+                </label>
+
+                <label>
+                  Email
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      setEmailError('');
+                    }}
+                    aria-invalid={Boolean(emailError)}
+                    aria-describedby={emailError ? 'email-error' : undefined}
+                  />
+                  {emailError ? (
+                    <span className="field-error" id="email-error">
+                      {emailError}
+                    </span>
+                  ) : null}
+                </label>
+
+                <fieldset className="method">
+                  <legend>Delivery or pickup?</legend>
+                  <label>
+                    <input
+                      type="radio"
+                      name="method"
+                      checked={method === 'pickup'}
+                      onChange={() => setMethod('pickup')}
+                    />
+                    Pickup
+                  </label>
+                  <label>
+                    <input
+                      type="radio"
+                      name="method"
+                      checked={method === 'delivery'}
+                      onChange={() => setMethod('delivery')}
+                    />
+                    Delivery
+                  </label>
+                </fieldset>
+
+                <div className="form-actions">
+                  <button type="button" className="btn-cancel" onClick={() => setFormOpen(false)}>
+                    Cancel
+                  </button>
+                  <button type="submit" className="order-btn">
+                    Place order
+                  </button>
+                </div>
+              </form>
+            ) : ordered ? (
+              <p className="toast">{confirmationMessage(orderedMethod)}</p>
+            ) : (
+              <button className="order-btn" onClick={() => setFormOpen(true)} disabled={empty}>
+                {empty ? 'Add a spice first' : 'Add blend to order'}
+              </button>
+            )}
+          </aside>
+        );
+      }
+
+      // ---- Footer ----
+      function Footer() {
+        return (
+          <footer className="footer" id="about">
+            <div className="shell footer-inner">
+              <div>
+                <div className="brand">
+                  <span className="dot" aria-hidden="true" /> YAAD SPICE CO.
+                </div>
+                <p style={{ maxWidth: '38ch', marginTop: '10px' }}>
+                  Your own personalized spice bench out of Montego Bay Jamaica. first of its kind Jamaican spices,
+                  made to order and mixed by you.
+                </p>
+              </div>
+              <div>
+                <p style={{ fontFamily: 'var(--font-mono)', fontSize: '12px' }}>
+                  A component-based web app
+                  <br />
+                  {new Date().getFullYear()}
+                </p>
+              </div>
+            </div>
+          </footer>
+        );
+      }
+
+      // ---- App: orchestrator ----
+      const CONFIRMATION_MS = 5000;
+
+      // Blend state is lifted here and flows down as props to SpiceCard / BlendSummary;
+      // their events flow back up through these handlers.
+      function App() {
+        const [selected, setSelected] = useState({}); // { spiceId: quantity }
+        const [ordered, setOrdered] = useState(false);
+        const orderTimeout = useRef(null);
+
+        function clearOrder() {
+          if (orderTimeout.current) {
+            clearTimeout(orderTimeout.current);
+            orderTimeout.current = null;
+          }
+          setOrdered(false);
+        }
+
+        function placeOrder() {
+          setOrdered(true);
+          if (orderTimeout.current) clearTimeout(orderTimeout.current);
+          orderTimeout.current = setTimeout(() => setOrdered(false), CONFIRMATION_MS);
+        }
+
+        function toggle(id) {
+          clearOrder();
+          setSelected((prev) => {
+            const next = { ...prev };
+            if (next[id]) delete next[id];
+            else next[id] = 1;
+            return next;
+          });
+        }
+
+        function changeQty(id, delta) {
+          clearOrder();
+          setSelected((prev) => {
+            const current = prev[id] || 0;
+            const qty = Math.max(1, current + delta);
+            return { ...prev, [id]: qty };
+          });
+        }
+
+        // Build the line items handed to the summary: one entry per spice that's
+        // actually in the blend, with its chosen quantity attached.
+        const items = [];
+        for (const spice of SPICES) {
+          const qty = selected[spice.id];
+          if (qty) {
+            items.push({ ...spice, qty });
+          }
+        }
+
+        return (
+          <>
+            <NavBar />
+            <main>
+              <Hero />
+
+              <section className="builder" id="build">
+                <div className="shell">
+                  <div className="section-head">
+                    <p className="eyebrow">The bench</p>
+                    <h2>Build your blend</h2>
+                    <p>
+                      Tap a spice to add it, then use − / + to set how much goes in. The meter and
+                      the total update as you go.
+                    </p>
+                  </div>
+
+                  <div className="builder-grid">
+                    <div className="spice-grid">
+                      {SPICES.map((spice) => (
+                        <SpiceCard
+                          key={spice.id}
+                          spice={spice}
+                          selected={Boolean(selected[spice.id])}
+                          qty={selected[spice.id] || 0}
+                          onToggle={toggle}
+                          onQty={changeQty}
+                        />
+                      ))}
+                    </div>
+
+                    <BlendSummary items={items} ordered={ordered} onOrder={placeOrder} />
+                  </div>
+                </div>
+              </section>
+
+              <section className="builder" id="how" style={{ paddingTop: 0 }}>
+                <div className="shell">
+                  <div className="section-head">
+                    <p className="eyebrow">How it works</p>
+                    <h2>Three steps</h2>
+                  </div>
+                  <div className="steps-grid">
+                    <div className="card">
+                      <h3 className="card-name">1 · Pick</h3>
+                      <p className="card-note">Add any of the eight single-origin spices to the bench.</p>
+                    </div>
+                    <div className="card">
+                      <h3 className="card-name">2 · Dial</h3>
+                      <p className="card-note">Set the amount of each. The ember meter shows your heat.</p>
+                    </div>
+                    <div className="card">
+                      <h3 className="card-name">3 · Order</h3>
+                      <p className="card-note">We grind it fresh and ship your one-of-a-kind blend.</p>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            </main>
+            <Footer />
+          </>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById('root'));
+      root.render(<App />);
+    </script>
+
+    <script>
+      // Compile the JSX above with the classic React.createElement runtime
+      // (the automatic runtime needs an ES-module "react/jsx-runtime" import,
+      // which the plain UMD React build loaded above doesn't provide).
+      const source = document.getElementById('app-source').textContent;
+      const compiled = Babel.transform(source, {
+        presets: [['react', { runtime: 'classic' }]],
+      }).code;
+      const script = document.createElement('script');
+      script.textContent = compiled;
+      document.body.appendChild(script);
+    </script>
+  </body>
+</html>

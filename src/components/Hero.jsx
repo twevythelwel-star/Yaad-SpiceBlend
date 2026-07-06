@@ -1,5 +1,3 @@
-// COMPONENT 2: Hero
-// The thesis of the page: you mix the blend, not us.
 export default function Hero() {
   return (
     <section className="hero" id="top">

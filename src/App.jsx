@@ -8,9 +8,8 @@ import { SPICES } from './data/spices.js'
 
 const CONFIRMATION_MS = 5000
 
-// App is the orchestrator. The blend lives here as lifted state and flows
-// DOWN into SpiceCard / BlendSummary as props; their events flow UP to these
-// handlers. That one-direction data flow is the whole point of the exercise.
+// Blend state is lifted here and flows down as props to SpiceCard / BlendSummary;
+// their events flow back up through these handlers.
 export default function App() {
   const [selected, setSelected] = useState({}) // { spiceId: quantity }
   const [ordered, setOrdered] = useState(false)
@@ -49,11 +48,15 @@ export default function App() {
     })
   }
 
-  // Derive the line items handed to the summary.
-  const items = SPICES.filter((s) => selected[s.id]).map((s) => ({
-    ...s,
-    qty: selected[s.id],
-  }))
+  // Build the line items handed to the summary: one entry per spice that's
+  // actually in the blend, with its chosen quantity attached.
+  const items = []
+  for (const spice of SPICES) {
+    const qty = selected[spice.id]
+    if (qty) {
+      items.push({ ...spice, qty })
+    }
+  }
 
   return (
     <>

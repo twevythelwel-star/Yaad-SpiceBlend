@@ -1,5 +1,3 @@
-// COMPONENT 1: NavBar
-// A sticky top navigation menu (usability feature: persistent wayfinding).
 export default function NavBar() {
   return (
     <header className="nav">

@@ -1,26 +1,38 @@
-// COMPONENT 3: SpiceCard (the reusable workhorse)
-// Rendered once per spice. Receives all data + state through PROPS and
-// communicates back up through EVENT CALLBACKS — the core of the
-// component-based architecture: data down, events up.
+const PIP_COUNT = 5
+const PIP_INDEXES = [0, 1, 2, 3, 4]
+
+// Works out the CSS class for a single pip based on how many pips are lit
+// and whether this spice is hot enough to use the "hot" color.
+function pipClass(index, litCount, heat) {
+  if (index >= litCount) return 'pip'
+  if (heat >= 8) return 'pip hot'
+  return 'pip on'
+}
+
+// Rendered once per spice; receives data via props and reports back via callbacks.
 function HeatPips({ heat }) {
   // Show 5 pips; light them based on the spice's heat weight.
-  const lit = Math.min(5, Math.round(heat / 2))
+  const litCount = Math.min(PIP_COUNT, Math.round(heat / 2))
   return (
-    <div className="heat-pips" aria-label={`Heat level ${lit} of 5`}>
-      {Array.from({ length: 5 }).map((_, i) => (
-        <span
-          key={i}
-          className={'pip' + (i < lit ? (heat >= 8 ? ' hot' : ' on') : '')}
-          aria-hidden="true"
-        />
+    <div className="heat-pips" aria-label={`Heat level ${litCount} of 5`}>
+      {PIP_INDEXES.map((index) => (
+        <span key={index} className={pipClass(index, litCount, heat)} aria-hidden="true" />
       ))}
     </div>
   )
 }
 
+function cardClass(selected) {
+  return selected ? 'card selected' : 'card'
+}
+
+function toggleClass(selected) {
+  return selected ? 'toggle added' : 'toggle'
+}
+
 export default function SpiceCard({ spice, selected, qty, onToggle, onQty }) {
   return (
-    <article className={'card' + (selected ? ' selected' : '')}>
+    <article className={cardClass(selected)}>
       <div className="card-top">
         <h3 className="card-name">{spice.name}</h3>
         <HeatPips heat={spice.heat} />
@@ -43,7 +55,7 @@ export default function SpiceCard({ spice, selected, qty, onToggle, onQty }) {
         ) : null}
 
         <button
-          className={'toggle' + (selected ? ' added' : '')}
+          className={toggleClass(selected)}
           onClick={() => onToggle(spice.id)}
           aria-pressed={selected}
         >

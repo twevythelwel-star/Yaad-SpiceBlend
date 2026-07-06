@@ -1,4 +1,3 @@
-// COMPONENT 6: Footer
 export default function Footer() {
   return (
     <footer className="footer" id="about">
@@ -16,7 +15,7 @@ export default function Footer() {
           <p style={{ fontFamily: 'var(--font-mono)', fontSize: '12px' }}>
             A component-based web app
             <br />
-           {new Date().getFullYear()}
+            {new Date().getFullYear()}
           </p>
         </div>
       </div>

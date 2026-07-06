@@ -4,7 +4,7 @@ A build-your-own Jamaican jerk blend configurator. Built with **Vite + React** a
 reusable components. The user composes a spice blend; price and a live heat meter recompute on
 every interaction.
 
-**Live site:** https://twevythelwel-star.github.io/YaadSpiceCo/  ← (update if you rename the repo)
+**Live site:** https://twevythelwel-star.github.io/yaad-spice/
 
 ---
 
@@ -27,10 +27,10 @@ actual development.
 
 ## Deploy to GitHub Pages (no local build needed)
 
-1. Create a **public** repo named `YaadSpiceCo` under your account and push this folder to `main`.
+1. Create a **public** repo named `yaad-spice` under your account and push this folder to `main`.
 2. In **Settings → Pages → Build and deployment → Source**, choose **GitHub Actions**.
 3. The included workflow (`.github/workflows/deploy.yml`) builds and publishes on every push.
-4. Your site goes live at `https://<your-username>.github.io/YaadSpiceCo/`.
+4. Your site goes live at `https://<your-username>.github.io/yaad-spice/`.
 
 > If you use a **different repo name**, change `base` in `vite.config.js` to `'/<that-name>/'`,
 > or the page loads blank because the asset paths won't match.

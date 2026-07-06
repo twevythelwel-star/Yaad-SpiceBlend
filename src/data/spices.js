@@ -80,9 +80,18 @@ export function heatLabel(score) {
 // A bit of personality: name the blend from its make-up.
 export function blendPersonality(items) {
   if (items.length === 0) return null
-  const heat = items.reduce((s, i) => s + i.heat * i.qty, 0)
-  const hasBonnet = items.some((i) => i.id === 'scotch-bonnet')
-  const herby = items.filter((i) => i.tag === 'herb').length >= 2
+
+  let heat = 0
+  let hasBonnet = false
+  let herbCount = 0
+
+  for (const item of items) {
+    heat += item.heat * item.qty
+    if (item.id === 'scotch-bonnet') hasBonnet = true
+    if (item.tag === 'herb') herbCount += 1
+  }
+  const herby = herbCount >= 2
+
   if (heat > 24) return 'Firestarter'
   if (hasBonnet && herby) return 'Sunday Yard Cook'
   if (herby) return 'Green & Easy'
