@@ -1,8 +1,6 @@
-# Yaad Spice Co. — Component-Based Website
+# Yaad Spice Co. — Component-Based Website (Vue.js via CDN)
 
-A build-your-own Jamaican jerk blend configurator. Built with **Vite + React** as separate,
-reusable components. The user composes a spice blend; price and a live heat meter recompute on
-every interaction.
+A build-your-own Jamaican jerk blend configurator. Built as separate, reusable components using **Vue.js loaded via a CDN (ES Modules)**, eliminating `node_modules` completely. The user composes a spice blend; price and a live heat meter recompute on every interaction.
 
 **Live site:** https://twevythelwel-star.github.io/yaad-spice/
 
@@ -10,30 +8,29 @@ every interaction.
 
 ## Run locally
 
+Since the codebase uses modern ES6 modules natively in the browser, opening the file directly (via `file://` protocol) will trigger browser CORS restrictions. To run locally, serve the directory using any static web server:
+
+**Using Python:**
 ```bash
-npm install
-npm run dev        # http://localhost:5173
-npm run build      # production bundle in /dist
-npm run preview    # preview the production build
+python -m http.server 8000
+# Then visit http://localhost:8000
 ```
 
-## Standalone version (no npm, no server)
+**Using Node (npx):**
+```bash
+npx http-server -p 8000
+```
 
-[`standalone/index.html`](standalone/index.html) is a self-contained copy of the same app —
-just open it directly in a browser (double-click it). It loads React, ReactDOM, and Babel from
-a CDN and compiles the JSX in the browser, so it needs an internet connection the first time but
-no local install or dev server. Use this for a quick look; use the npm/Vite project above for
-actual development.
+*Or use editor extensions like VS Code's "Live Server".*
 
-## Deploy to GitHub Pages (no local build needed)
+---
 
-1. Create a **public** repo named `yaad-spice` under your account and push this folder to `main`.
+## Deploy to GitHub Pages
+
+1. Create a **public** repository named `yaad-spice` under your GitHub account and push this folder to the `main` branch.
 2. In **Settings → Pages → Build and deployment → Source**, choose **GitHub Actions**.
-3. The included workflow (`.github/workflows/deploy.yml`) builds and publishes on every push.
+3. The included workflow (`.github/workflows/deploy.yml`) deploys the static files directly on every push.
 4. Your site goes live at `https://<your-username>.github.io/yaad-spice/`.
-
-> If you use a **different repo name**, change `base` in `vite.config.js` to `'/<that-name>/'`,
-> or the page loads blank because the asset paths won't match.
 
 ---
 
@@ -41,29 +38,30 @@ actual development.
 
 | File | Component | Role |
 |------|-----------|------|
-| `src/components/NavBar.jsx` | `NavBar` | Sticky navigation menu |
-| `src/components/Hero.jsx` | `Hero` | Landing / thesis section |
-| `src/components/SpiceCard.jsx` | `SpiceCard` | **Reusable** card, rendered once per spice via props + event callbacks |
-| `src/components/HeatMeter.jsx` | `HeatMeter` | Live ember heat bar (derived state) |
-| `src/components/BlendSummary.jsx` | `BlendSummary` | Composes `HeatMeter`, shows live total + order action |
-| `src/components/Footer.jsx` | `Footer` | Footer |
-| `src/App.jsx` | `App` | Orchestrator; holds lifted blend state |
+| [index.html](index.html) | Root Document | Main structure (Sticky NavBar, Hero section, and Footer) with the `#app` mount target |
+| [src/app.js](src/app.js) | Main Orchestrator | Imports Vue from CDN, manages the reactive blend state, and mounts the application |
+| [src/components/SpiceCard.js](src/components/SpiceCard.js) | `SpiceCard` | **Reusable** card, rendered once per spice via props + emits custom state events |
+| [src/components/HeatMeter.js](src/components/HeatMeter.js) | `HeatMeter` | Live ember heat bar (presentational component, accepts score and label props) |
+| [src/components/BlendSummary.js](src/components/BlendSummary.js) | `BlendSummary` | Composes `HeatMeter`, shows dynamic total, and handles checkout form validation |
+| [src/data/spices.js](src/data/spices.js) | Data Module | Shared ES6 module housing the product catalogue, heat calculations, and personality naming |
 
-Architecture: state lives in `App`, flows **down** as props, and child **events flow up** to
-handlers — the one-direction data flow that defines a component-based system.
+Architecture: State lives in the central Vue app instance, flows **down** as props to custom components, and child **events flow up** via `emits` to state handlers—forming a standard one-direction data flow.
+
+---
 
 ## Graphical interface (Criterion 2)
 
-Custom palette derived from a jerk pan (charred background, bonnet ember gradient, thyme green),
-Anton / Outfit / Space Mono type system, responsive grid layout.
+Custom palette derived from the Jamaican flag (charred background, gold accents for CTAs, green accents for borders/hovers), Anton / Outfit / Space Mono typography, and responsive grids.
+
+---
 
 ## Usability features (Criterion 3) — more than two
 
-1. Sticky navigation menu with smooth-scroll anchors
-2. Color-coded heat (per-spice pips + the ember meter)
-3. Interactive buttons: add/remove, − / + quantity, order
-4. Live feedback — price, heat, and Scoville read-out update instantly
-5. Keyboard-accessible controls with a visible focus ring; `aria` labels and `aria-live` summary
-6. Responsive down to mobile
-7. Empty-state guidance and a disabled order button until a spice is chosen
-8. `prefers-reduced-motion` respected
+1. **Sticky Navigation Menu** with smooth-scroll anchors
+2. **Color-Coded Heat Meter** (per-spice pips + dynamic ember progression bar)
+3. **Interactive Control Bench** (reusable add/remove buttons, quantity − / + controls)
+4. **Instant Live Feedback** (price, Scoville heat level, and custom blend personality update dynamically)
+5. **Form Validation** (real-time validations for checkout name, phone, and email fields)
+6. **Accessibility Compliance** (visible focus rings for keyboard users, semantic HTML5 elements, and `aria-live` summary)
+7. **Responsive Design** (fluid down to mobile layouts)
+8. **Empty-State Support** (guiding message and disabled order button until spices are chosen)

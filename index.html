@@ -11,9 +11,130 @@
       href="https://fonts.googleapis.com/css2?family=Anton&family=Outfit:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
+    <link rel="stylesheet" href="./src/index.css" />
   </head>
   <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
+    <div id="app">
+      <header class="nav">
+        <div class="shell nav-inner">
+          <a class="brand" href="#top" aria-label="Yaad Spice Co. home">
+            <span class="dot" aria-hidden="true"></span>
+            YAAD SPICE CO.
+          </a>
+          <nav class="nav-links" aria-label="Main">
+            <a href="#build">Build</a>
+            <a href="#how">How it works</a>
+            <a href="#about">About</a>
+            <a class="nav-cta" href="#build">Start mixing</a>
+          </nav>
+        </div>
+      </header>
+
+      <main>
+        <section class="hero" id="top">
+          <div class="shell">
+            <p class="eyebrow">
+              <span aria-hidden="true">🇯🇲</span> Montego Bay · Small-batch · Ground to order
+            </p>
+            <h1>
+              Mix yuh own <span class="flame">jerk.</span>
+            </h1>
+            <p class="lead">
+              Eight single-origin Jamaican spices. Pick what you want, dial the heat, and watch
+              the price and the burn move with every scoop. No two blends the same.
+            </p>
+            <div class="hero-actions">
+              <a class="btn btn-primary" href="#build">Start your blend</a>
+              <a class="btn btn-ghost" href="#how">See how it works</a>
+            </div>
+            <div class="hero-meta">
+              <div><b>8</b> single spices</div>
+              <div><b>0–30+</b> heat range</div>
+              <div><b>Ground</b> the day it ships</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="builder" id="build">
+          <div class="shell">
+            <div class="section-head">
+              <p class="eyebrow">The bench</p>
+              <h2>Build your blend</h2>
+              <p>
+                Tap a spice to add it, then use − / + to set how much goes in. The meter and
+                the total update as you go.
+              </p>
+            </div>
+
+            <div class="builder-grid">
+              <div class="spice-grid">
+                <spice-card
+                  v-for="spice in spices"
+                  :key="spice.id"
+                  :spice="spice"
+                  :selected="!!selected[spice.id]"
+                  :qty="selected[spice.id] || 0"
+                  @toggle="toggle"
+                  @qty="changeQty"
+                ></spice-card>
+              </div>
+
+              <blend-summary 
+                :items="items" 
+                :ordered="ordered" 
+                @order="placeOrder"
+              ></blend-summary>
+            </div>
+          </div>
+        </section>
+
+        <section class="builder" id="how" style="padding-top: 0;">
+          <div class="shell">
+            <div class="section-head">
+              <p class="eyebrow">How it works</p>
+              <h2>Three steps</h2>
+            </div>
+            <div class="steps-grid">
+              <div class="card">
+                <h3 class="card-name">1 · Pick</h3>
+                <p class="card-note">Add any of the eight single-origin spices to the bench.</p>
+              </div>
+              <div class="card">
+                <h3 class="card-name">2 · Dial</h3>
+                <p class="card-note">Set the amount of each. The ember meter shows your heat.</p>
+              </div>
+              <div class="card">
+                <h3 class="card-name">3 · Order</h3>
+                <p class="card-note">We grind it fresh and ship your one-of-a-kind blend.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer" id="about">
+        <div class="shell footer-inner">
+          <div>
+            <div class="brand">
+              <span class="dot" aria-hidden="true"></span> YAAD SPICE CO.
+            </div>
+            <p style="max-width: 38ch; margin-top: 10px;">
+              Your own personalized spice bench out of Montego Bay Jamaica. first of its kind Jamaican spices,
+              made to order and mixed by you.
+            </p>
+          </div>
+          <div>
+            <p style="font-family: var(--font-mono); font-size: 12px;">
+              A component-based web app
+              <br />
+              2026
+            </p>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <!-- Vue App scripts -->
+    <script type="module" src="./src/app.js"></script>
   </body>
 </html>
